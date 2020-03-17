@@ -47,10 +47,13 @@ def repeat_in_chunks(so, name):
 
     # find the requested channel
     channel = None
-    for ch in so.web_client.conversations_list(types="private_channel"):
+    for ch in so.web_client.conversations_list(types="private_channel")["channels"]:
+        print(f"channel {ch}")
+
         if ch["name"] == name:
             channel = ch
             break
+
     if not channel:
         so.say(f"Sorry, I see no such channel {name}")
         return
