@@ -48,8 +48,6 @@ def repeat_in_chunks(so, name):
     # find the requested channel
     channel = None
     for ch in so.web_client.conversations_list(types="private_channel")["channels"]:
-        print(f"channel {ch}")
-
         if ch["name"] == name:
             channel = ch
             break
@@ -60,7 +58,8 @@ def repeat_in_chunks(so, name):
 
     # send one message per chunk to private channel.
     for chunk in chunks:
-        so.web_client.chat_postMessage(
-            channel=channel["id"],
-            text=chunk,
-        )
+        if re.search(r"\S", chunk):
+            so.web_client.chat_postMessage(
+                channel=channel["id"],
+                text=chunk,
+            )
