@@ -43,7 +43,7 @@ def repeat_in_chunks(so, name):
     text = re.sub(r"^[^:]+:", "", so.request_payload["data"]["text"])
 
     # split by eol and periods followed by a space. ignore formatting if possible.
-    chunks = re.sub(r"(\S\S\.)(\s+|$)", "\1\n", text, flags=re.M).splitlines()
+    chunks = re.sub(r"(\S\S\.)(\s+|$)", r"\1\n", text, flags=re.M).splitlines()
 
     # find the requested channel
     channel = None
@@ -56,10 +56,13 @@ def repeat_in_chunks(so, name):
         so.say(f"Sorry, I see no such channel {name}")
         return
 
+    so.say(f"Sending that to channel {name}.")
     # send one message per chunk to private channel.
     for chunk in chunks:
         if re.search(r"\S", chunk):
             so.web_client.chat_postMessage(
                 channel=channel["id"],
                 text=chunk,
+                unfurl_links=False,
+                unfurl_media=False,
             )
