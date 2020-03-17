@@ -16,7 +16,7 @@ import umb
 from artbotlib.buildinfo import buildinfo_for_release
 from artbotlib.translation import translate_names
 from artbotlib.util import cmd_assert, please_notify_art_team_of_error
-from artbotlib.formatting import extract_plain_text
+from artbotlib.formatting import extract_plain_text, repeat_in_chunks
 from artbotlib import brew_list
 
 MONITORING_CHANNEL = 'GTDLQU9LH'  # art-bot-monitoring
@@ -201,6 +201,7 @@ def respond(**payload):
                 (r'^What (?P<data_type>[\w.-]+) are associated with (?P<release_tag>[\w.-]+)$', re.I, brew_list.list_component_data_for_release_tag),
                 (r'^what is the %(name_type2)s for %(name_type)s %(name)s(?: in %(major_minor)s)?$' % re_snippets, re.I, translate_names),
                 (r'^(which|what) build of %(name)s is in (?P<release_img>[-.:/#\w]+)$' % re_snippets, re.I, buildinfo_for_release),
+                (r'^spray to %(name)s:' % re_snippets, re.I, repeat_in_chunks),
             ]
             for r in regex_maps:
                 m = re.match(r[0], plain_text, r[1])

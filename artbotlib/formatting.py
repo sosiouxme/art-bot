@@ -32,3 +32,32 @@ y-s390x-2020-02-21-235937'}],
 
     # reformat to homogenize miscellaneous confusing bits
     return re.sub(r"\s+", " ", text).lstrip().rstrip(" ?").lower()
+
+
+def repeat_in_chunks(so, name):
+    """
+    Repeat what the user says, one "sentence" at a time, in the indicated private channel.
+    """
+
+    # remove the directive at the beginning.
+    text = re.sub(r"^[^:]+:", "", so.request_payload["data"]["text"])
+
+    # split by eol and periods followed by a space. ignore formatting if possible.
+    chunks = re.match(r"^(  .*  (?: [^.]{2,} . (?:\s|$) | .+ $ ) )", text, re.M).groups()
+
+    # find the requested channel
+    channel = None
+    for ch in so.web_client.conversations_list(types="private_channel"):
+        if ch["name"] == name:
+            channel = ch
+            break
+    if not channel:
+        so.say(f"Sorry, I see no such channel {name}")
+        return
+
+    # send one message per chunk to private channel.
+    for chunk in chunks:
+        so.web_client.chat_postMessage(
+            channel=channel["id"],
+            text=chunk,
+        )
